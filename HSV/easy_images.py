@@ -2,7 +2,7 @@ import os
 import cv2
 import numpy as np
 import matplotlib.pyplot as plt
-from helper import normalize_hsv, imageMap, HSVCHANNEL, pipeline_path
+from helper import normalize_hsv, imageMap, HSVCHANNEL, pipeline_path, convert_to_binary
 from skimage.color import rgb2hsv
 
 
@@ -12,6 +12,7 @@ def threshold_image_hsv(image, lower, upper, index):
     upper = np.array(normalize_hsv(upper[0], upper[1], upper[2]))
     mask = cv2.inRange(hsv, lower, upper)
     final_image = cv2.bitwise_and(image, image, mask=mask)
+    final_image = convert_to_binary(final_image)
     path = os.path.join(pipeline_path, "easy", "trial_and_error")
     os.path.exists(path) or os.makedirs(path)
     cv2.imwrite(os.path.join(path, f"{index}.jpg"), final_image)
@@ -25,6 +26,7 @@ def threshold_image_with_blur(image, lower, upper, blur, index):
     mask = cv2.inRange(hsv, lower, upper)
     mask = cv2.GaussianBlur(mask, (blur, blur), 0)
     final_image = cv2.bitwise_and(image, image, mask=mask)
+    final_image = convert_to_binary(final_image)
     path = os.path.join(pipeline_path, "easy", "trial_and_error")
     cv2.imwrite(os.path.join(path, f"gaussianBlur_size{blur}_{index}.jpg"), final_image)
     return final_image
@@ -78,7 +80,7 @@ plt.axis("off")
 # plt.title("Trial & Error Method")
 easy_map: dict = [
     {"image": "easy1", "lower": [45, 10, 50], "upper": [70, 100, 100]},
-    {"image": "easy2", "lower": [45, 40, 50], "upper": [70, 100, 100]},
+    {"image": "easy2", "lower": [45, 51, 50], "upper": [70, 100, 100]},
     {"image": "easy3", "lower": [45, 0, 82], "upper": [66, 100, 100]},
 ]
 
@@ -92,7 +94,6 @@ easy_map_hsv: dict = [
         "channel": HSVCHANNEL.VALUE,
         "gaussian": 35,
     },
-    3,
 ]
 # Method 1: Trial and error method
 for i in range(len(easy_map)):

@@ -1,6 +1,7 @@
 import cv2
 from enum import Enum
-import os 
+import os
+
 input_path = "../Dataset/input_images/"
 output_path = "../output_images/"
 pipeline_path = os.path.join(os.getcwd(), "pipeline")
@@ -23,13 +24,21 @@ imageMap: dict = {
     "medium3": medium3_image,
     "hard1": hard1_image,
     "hard2": hard2_image,
-    "hard3": hard3_image
+    "hard3": hard3_image,
 }
 
-def normalize_hsv(h:int , s:int, v:int): 
-    return [h/2, s/100*255, v/100*255]
+
+def normalize_hsv(h: int, s: int, v: int):
+    return [h / 2, s / 100 * 255, v / 100 * 255]
+
 
 class HSVCHANNEL(Enum):
     HUE = 0
     SATURATION = 1
     VALUE = 2
+
+
+def convert_to_binary(image, min_value=10):
+    return cv2.threshold(
+        cv2.cvtColor(image, cv2.COLOR_BGR2GRAY), min_value, 255, cv2.THRESH_BINARY
+    )[1]
