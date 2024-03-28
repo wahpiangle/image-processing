@@ -35,7 +35,7 @@ def threshold_image_hsv(
     final_image = cv2.bitwise_and(image, image, mask=mask)
     if median_blur:
         final_image = cv2.medianBlur(final_image, 21)
-    final_image = convert_to_binary(final_image, median_blur)
+    # final_image = convert_to_binary(final_image, median_blur)
     path = os.path.join(pipeline_path, "hard", "trial_and_error")
     os.path.exists(path) or os.makedirs(path)
     cv2.imwrite(os.path.join(path, f"{index}.jpg"), final_image)
@@ -60,15 +60,14 @@ hard_map: dict = [
         "gaussian": 21,
         "median_blur": 21,
     },
-    # {
-    #     "image": "hard3",
-    #     "lower": [35, 15, 20],
-    #     "upper": [70, 100, 100],
-    #     "lower1": [0, 0, 20],
-    #     "upper1": [360, 20, 100],
-    #     "lower2": [0, 0, 0],
-    #     "upper2": [360, 100, 100],
-    # },
+    {
+        "image": "hard3",
+        "lower": [35, 20, 45],
+        "upper": [65, 100, 100],
+        "lower1": [0, 0, 40],
+        "upper1": [360, 20, 100],
+        "gaussian": 11,
+    },
 ]
 
 plt.figure(figsize=(20, 20))
