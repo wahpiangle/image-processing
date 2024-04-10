@@ -90,8 +90,9 @@ for key, image in imageMap.items():
 plt.figure(figsize=(12, 8))
 
 for i, image in enumerate(final_result, 1):
+    rgb = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
     plt.subplot(3, 3, i)
-    plt.imshow(image, cmap="gray")
+    plt.imshow(rgb)
     plt.title(f"{i}")
     plt.axis("off")
 
