@@ -1,6 +1,7 @@
 import cv2
 import numpy as np
 import matplotlib.pyplot as plt
+import os
 
 input_path = "Dataset/input_images/"
 output_path = "output_images/"
@@ -50,21 +51,37 @@ def sharpen_image_kernel(image):
     sharpened_image = cv2.filter2D(image, -1, kernel)
     return sharpened_image
 
+# Function to create a directory if it doesn't exist
+def create_directory(directory):
+    if not os.path.exists(directory):
+        os.makedirs(directory)
+
+# Function to save images in the specified directory
+def save_image(image, directory, filename):
+    cv2.imwrite(os.path.join(directory, filename), image)
+
+# Create directories for each step
+output_directories = ["gamma_corrected", "sharpened", "filtered", "thresholded", "morphological", "segmented"]
+for directory in output_directories:
+    create_directory(os.path.join(output_path, directory))
 
 final_result = []
 
 for key, image in imageMap.items():
     gray_image = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
     gamma_corrected_image = apply_gamma_correction(gray_image, gamma=1.5)
-    sharpened_image = sharpen_image_kernel(gamma_corrected_image)
+    save_image(gamma_corrected_image, os.path.join(output_path, "gamma_corrected"), f"{key}.jpg")
 
-    filtered_image = cv2.bilateralFilter(
-        sharpened_image, d=11, sigmaColor=120, sigmaSpace=120
-    )
+    sharpened_image = sharpen_image_kernel(gamma_corrected_image)
+    save_image(sharpened_image, os.path.join(output_path, "sharpened"), f"{key}.jpg")
+
+    filtered_image = cv2.bilateralFilter(sharpened_image, d=11, sigmaColor=120, sigmaSpace=120)
+    save_image(filtered_image, os.path.join(output_path, "filtered"), f"{key}.jpg")
 
     _, thresh = cv2.threshold(
         filtered_image, 0, 255, cv2.THRESH_BINARY + cv2.THRESH_OTSU
     )
+    save_image(thresh, os.path.join(output_path, "thresholded"), f"{key}.jpg")
 
     kernel = np.ones((5, 5), np.uint8)
     opening = cv2.morphologyEx(thresh, cv2.MORPH_OPEN, kernel, iterations=2)
@@ -77,9 +94,13 @@ for key, image in imageMap.items():
     markers = markers + 1
     markers[unknown == 255] = 0
 
+    save_image(opening, os.path.join(output_path, "morphological"), f"{key}.jpg")
+
     segmented_image = cv2.watershed(image, markers)
     segmented_image[segmented_image == 1] = 0
     segmented_image[segmented_image != 0] = 255
+
+    save_image(segmented_image, os.path.join(output_path, "segmented"), f"{key}.jpg")
 
     # Ensure correct data type
     segmented_image = np.uint8(segmented_image)
