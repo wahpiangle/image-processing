@@ -4,7 +4,8 @@ import matplotlib.pyplot as plt
 import os
 
 input_path = "Dataset/input_images/"
-output_path = "output_images/"
+output_path = "output/"
+pipeline_path = "pipeline/"
 
 easy1_image = cv2.imread(input_path + "easy/easy_1.jpg")
 easy2_image = cv2.imread(input_path + "easy/easy_2.jpg")
@@ -51,37 +52,37 @@ def sharpen_image_kernel(image):
     sharpened_image = cv2.filter2D(image, -1, kernel)
     return sharpened_image
 
-# Function to create a directory if it doesn't exist
-def create_directory(directory):
-    if not os.path.exists(directory):
-        os.makedirs(directory)
 
 # Function to save images in the specified directory
 def save_image(image, directory, filename):
+    if not os.path.exists(directory):
+        os.makedirs(directory)
     cv2.imwrite(os.path.join(directory, filename), image)
 
-# Create directories for each step
-output_directories = ["gamma_corrected", "sharpened", "filtered", "thresholded", "morphological", "segmented"]
-for directory in output_directories:
-    create_directory(os.path.join(output_path, directory))
 
 final_result = []
 
 for key, image in imageMap.items():
     gray_image = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
     gamma_corrected_image = apply_gamma_correction(gray_image, gamma=1.5)
-    save_image(gamma_corrected_image, os.path.join(output_path, "gamma_corrected"), f"{key}.jpg")
+    save_image(
+        gamma_corrected_image,
+        os.path.join(pipeline_path, "gamma_corrected"),
+        f"{key}.jpg",
+    )
 
     sharpened_image = sharpen_image_kernel(gamma_corrected_image)
-    save_image(sharpened_image, os.path.join(output_path, "sharpened"), f"{key}.jpg")
+    save_image(sharpened_image, os.path.join(pipeline_path, "sharpened"), f"{key}.jpg")
 
-    filtered_image = cv2.bilateralFilter(sharpened_image, d=11, sigmaColor=120, sigmaSpace=120)
-    save_image(filtered_image, os.path.join(output_path, "filtered"), f"{key}.jpg")
+    filtered_image = cv2.bilateralFilter(
+        sharpened_image, d=11, sigmaColor=120, sigmaSpace=120
+    )
+    save_image(filtered_image, os.path.join(pipeline_path, "filtered"), f"{key}.jpg")
 
     _, thresh = cv2.threshold(
         filtered_image, 0, 255, cv2.THRESH_BINARY + cv2.THRESH_OTSU
     )
-    save_image(thresh, os.path.join(output_path, "thresholded"), f"{key}.jpg")
+    save_image(thresh, os.path.join(pipeline_path, "thresholded"), f"{key}.jpg")
 
     kernel = np.ones((5, 5), np.uint8)
     opening = cv2.morphologyEx(thresh, cv2.MORPH_OPEN, kernel, iterations=2)
@@ -94,18 +95,19 @@ for key, image in imageMap.items():
     markers = markers + 1
     markers[unknown == 255] = 0
 
-    save_image(opening, os.path.join(output_path, "morphological"), f"{key}.jpg")
+    save_image(opening, os.path.join(pipeline_path, "morphological"), f"{key}.jpg")
 
     segmented_image = cv2.watershed(image, markers)
     segmented_image[segmented_image == 1] = 0
     segmented_image[segmented_image != 0] = 255
 
-    save_image(segmented_image, os.path.join(output_path, "segmented"), f"{key}.jpg")
+    save_image(segmented_image, os.path.join(pipeline_path, "segmented"), f"{key}.jpg")
 
     # Ensure correct data type
     segmented_image = np.uint8(segmented_image)
     # get the binary image
     segmented_image = cv2.bitwise_and(image, image, mask=segmented_image)
+    save_image(segmented_image, os.path.join(output_path, "final"), f"{key}.jpg")
     final_result.append(segmented_image)
 
 plt.figure(figsize=(12, 8))

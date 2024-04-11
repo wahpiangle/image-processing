@@ -68,6 +68,7 @@ def threshold_by_hsv_channel(image, lower, upper, channel: HSVCHANNEL, index, ga
     # convert final image to BGR
     path = os.path.join(pipeline_path, "easy", "hsv_channel_segmentation")
     os.path.exists(path) or os.makedirs(path)
+    final_image = convert_to_binary(final_image)
     cv2.imwrite(os.path.join(path, f"{index}.jpg"), final_image)
     ax[2].imshow(final_image)
     ax[1].set_title("Mask", fontsize=15)

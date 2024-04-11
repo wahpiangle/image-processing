@@ -38,6 +38,7 @@ def threshold_image_hsv(
     # final_image = convert_to_binary(final_image, median_blur)
     path = os.path.join(pipeline_path, "hard", "trial_and_error")
     os.path.exists(path) or os.makedirs(path)
+    final_image = convert_to_binary(final_image)
     cv2.imwrite(os.path.join(path, f"{index}.jpg"), final_image)
     return final_image
 
