@@ -53,6 +53,7 @@ def sharpen_image_kernel(image):
     return sharpened_image
 
 
+
 # Function to save images in the specified directory
 def save_image(image, directory, filename):
     if not os.path.exists(directory):
@@ -79,10 +80,8 @@ for key, image in imageMap.items():
     )
     save_image(filtered_image, os.path.join(pipeline_path, "filtered"), f"{key}.jpg")
 
-    _, thresh = cv2.threshold(
-        filtered_image, 0, 255, cv2.THRESH_BINARY + cv2.THRESH_OTSU
-    )
-    save_image(thresh, os.path.join(pipeline_path, "thresholded"), f"{key}.jpg")
+    _, thresh = cv2.threshold(filtered_image, 0, 255, cv2.THRESH_BINARY + cv2.THRESH_OTSU)
+    save_image(thresh, os.path.join(output_path, "thresholded"), f"{key}.jpg")
 
     kernel = np.ones((5, 5), np.uint8)
     opening = cv2.morphologyEx(thresh, cv2.MORPH_OPEN, kernel, iterations=2)
@@ -97,9 +96,10 @@ for key, image in imageMap.items():
 
     save_image(opening, os.path.join(pipeline_path, "morphological"), f"{key}.jpg")
 
+    # Apply watershed segmentation
     segmented_image = cv2.watershed(image, markers)
     segmented_image[segmented_image == 1] = 0
-    segmented_image[segmented_image != 0] = 255
+    segmented_image[segmented_image > 1] =  255
 
     save_image(segmented_image, os.path.join(pipeline_path, "segmented"), f"{key}.jpg")
 
@@ -110,8 +110,8 @@ for key, image in imageMap.items():
     save_image(segmented_image, os.path.join(output_path, "final"), f"{key}.jpg")
     final_result.append(segmented_image)
 
+# Visualize the segmented results
 plt.figure(figsize=(12, 8))
-
 for i, image in enumerate(final_result, 1):
     rgb = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
     plt.subplot(3, 3, i)
@@ -122,3 +122,4 @@ for i, image in enumerate(final_result, 1):
 # Adjust layout to prevent overlap
 plt.tight_layout()
 plt.show()
+
