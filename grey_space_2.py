@@ -64,6 +64,7 @@ final_result = []
 
 for key, image in imageMap.items():
     gray_image = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
+    save_image(gray_image, os.path.join(pipeline_path, "gray"), f"{key}.jpg")
     gamma_corrected_image = apply_gamma_correction(gray_image, gamma=1.5)
     save_image(
         gamma_corrected_image,
