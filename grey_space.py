@@ -53,8 +53,6 @@ def post_process(binary_image):
     # Morphological operations for noise removal and smoothing
     kernel = np.ones((5,5),np.uint8)
     kernel_ellipse = cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (5, 5))
-    kernel_rectangular = cv2.getStructuringElement(cv2.MORPH_RECT, (5, 5))
-    kernel_cross = cv2.getStructuringElement(cv2.MORPH_CROSS, (5, 5))
     
     
     # erosion -> dilation -> close  BETTER 
