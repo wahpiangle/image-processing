@@ -4,8 +4,8 @@ import matplotlib.pyplot as plt
 import os
 
 input_path = "Dataset/input_images/"
-output_path = "output/"
-pipeline_path = "pipeline/"
+output_path = "output_images/"
+pipeline_path = "image_processing_pipeline/"
 
 easy1_image = cv2.imread(input_path + "easy/easy_1.jpg")
 easy2_image = cv2.imread(input_path + "easy/easy_2.jpg")
