@@ -83,7 +83,7 @@ for key, image in imageMap.items():
     _, thresh = cv2.threshold(
         filtered_image, 0, 255, cv2.THRESH_BINARY + cv2.THRESH_OTSU
     )
-    save_image(thresh, os.path.join(output_path, "thresholded"), f"{key}.jpg")
+    save_image(thresh, os.path.join(pipeline_path, "thresholded"), f"{key}.jpg")
 
     kernel = np.ones((5, 5), np.uint8)
     opening = cv2.morphologyEx(thresh, cv2.MORPH_OPEN, kernel, iterations=2)
